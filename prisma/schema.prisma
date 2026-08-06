@@ -1,0 +1,258 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ElectionStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+  RESULT_DECLARED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model User {
+  id String @id @default(cuid())
+
+  // Student Details (From ERP)
+  studentId   String  @unique
+  admissionId String? @unique
+
+  firstName  String
+  middleName String?
+  lastName   String?
+
+  fatherName String?
+  motherName String?
+
+  mobile       String?
+  fatherMobile String?
+  motherMobile String?
+
+  email String?
+
+  gender String?
+
+  dob DateTime?
+
+  className String?
+  section   String?
+
+  batchId   String?
+  courseId  String?
+  sessionId String?
+
+  address String?
+  city    String?
+  state   String?
+  country String?
+  pincode String?
+
+  bloodGroup  String?
+  religion    String?
+  nationality String?
+
+  loginCount  Int       @default(0)
+  lastLoginAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  votes Vote[]
+
+  @@index([studentId])
+  @@index([className])
+  @@index([batchId])
+}
+
+model Election {
+  id String @id @default(cuid())
+
+  title       String
+  description String?
+
+  startAt DateTime
+  endAt   DateTime
+
+  status ElectionStatus @default(DRAFT)
+
+  isCurrent Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  positions  Position[]
+  votes      Vote[]
+  results    ElectionResult[]
+  candidates Candidate[]
+
+  @@index([status])
+}
+
+model Position {
+  id String @id @default(cuid())
+
+  electionId String
+  election   Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+
+  maxVotes Int @default(1)
+
+  displayOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  candidates Candidate[]
+  votes      Vote[]
+  result     ElectionResult?
+
+  @@unique([electionId, name])
+}
+
+model Candidate {
+  id String @id @default(cuid())
+
+  electionId String
+  election   Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  // Student Information (Snapshot)
+  studentId String
+
+  admissionId String?
+
+  firstName  String
+  middleName String?
+  lastName   String?
+
+  fullName String
+
+  className String?
+  section   String?
+
+  image String?
+
+  slogan    String?
+  manifesto String?
+
+  symbol String?
+
+  voteCount Int @default(0)
+
+  isWinner Boolean @default(false)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  votes   Vote[]
+  results ElectionResult[]
+
+  @@index([studentId])
+  @@index([positionId])
+}
+
+model Vote {
+  id String @id @default(cuid())
+
+  electionId String
+  election   Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id])
+
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+
+  voterId String
+  voter   User   @relation(fields: [voterId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([voterId, positionId])
+  @@index([candidateId])
+  @@index([positionId])
+  @@index([electionId])
+}
+
+model ElectionResult {
+  id String @id @default(cuid())
+
+  electionId String
+  election   Election @relation(fields: [electionId], references: [id], onDelete: Cascade)
+
+  positionId String   @unique
+  position   Position @relation(fields: [positionId], references: [id])
+
+  winnerId String
+  winner   Candidate @relation(fields: [winnerId], references: [id])
+
+  totalVotes Int
+
+  declaredAt DateTime @default(now())
+
+  @@index([electionId])
+}
+
+model Admin {
+  id String @id @default(cuid())
+
+  name String
+
+  email String @unique
+
+  password String
+
+  role AdminRole @default(ADMIN)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime   @updatedAt
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+
+  adminId String
+  admin   Admin  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  action String
+
+  entity String
+
+  entityId String?
+
+  description String?
+
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
+model Setting {
+  id String @id @default(cuid())
+
+  key String @unique
+
+  value String
+
+  updatedAt DateTime @updatedAt
+}

@@ -1,0 +1,884 @@
+{
+  "info": {
+    "_postman_id": "7df8c17b-232a-4a6c-9c76-ec8d1a1b1d4b",
+    "name": "School Voting System",
+    "description": "API collection for the School Voting System backend. Configured with student synchronization, admin authentication, election and position management, candidate nominations, voting, and real-time dashboard results.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "General",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Student APIs",
+      "item": [
+        {
+          "name": "Student Sync Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.globals.set(\"student_token\", response.token);",
+                  "    console.log(\"Student JWT token saved as global variable 'student_token'\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stdid\": \"S003288\",\n  \"FirstName\": \"AAROHI RAI\",\n  \"MidName\": \"\",\n  \"LastName\": \"\",\n  \"Mobile\": \"8542885042\",\n  \"AdmissionId\": \"14033\",\n  \"cls\": \"II\",\n  \"section\": \"A1\",\n  \"father\": \"ALOK RAI\",\n  \"mother\": \"SARITA RAI\",\n  \"fcontact\": \"8542885042\",\n  \"mcontact\": \"6394320115\",\n  \"Gender\": \"Female\",\n  \"BloodGroup\": \"Unknown\",\n  \"Religion\": \"Other\",\n  \"Country\": \"India\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/student/auth/sync",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "auth",
+                "sync"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Active Election",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/student/election/current",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "election",
+                "current"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cast Vote",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"electionId\": \"ELECTION_ID_HERE\",\n  \"positionId\": \"POSITION_ID_HERE\",\n  \"candidateId\": \"CANDIDATE_ID_HERE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/student/vote",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "vote"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Cast Votes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/student/votes/my",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "votes",
+                "my"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Closed Election Results",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{student_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/student/election/results",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "election",
+                "results"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin APIs",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.globals.set(\"admin_token\", response.token);",
+                  "    console.log(\"Admin JWT token saved as global variable 'admin_token'\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@school.com\",\n  \"password\": \"adminpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Admin (Super Admin only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Assistant\",\n  \"email\": \"assistant@school.com\",\n  \"password\": \"assistantpass123\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bootstrap Initial Admin (If DB is empty)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Super Administrator\",\n  \"email\": \"admin@school.com\",\n  \"password\": \"adminpassword123\",\n  \"role\": \"SUPER_ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth/bootstrap",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth",
+                "bootstrap"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Elections",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/elections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "elections"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Election",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"School Council Elections 2026\",\n  \"description\": \"Election of House Captain and Vice Captain for session 2026-27\",\n  \"startAt\": \"2026-08-06T09:00:00Z\",\n  \"endAt\": \"2026-08-07T09:00:00Z\",\n  \"isCurrent\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/elections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "elections"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Election (Start/End/Status)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\",\n  \"isCurrent\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/elections/ELECTION_ID_HERE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "elections",
+                "ELECTION_ID_HERE"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Election",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/elections/ELECTION_ID_HERE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "elections",
+                "ELECTION_ID_HERE"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Positions for Election",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/elections/ELECTION_ID_HERE/positions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "elections",
+                "ELECTION_ID_HERE",
+                "positions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Position",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"electionId\": \"ELECTION_ID_HERE\",\n  \"name\": \"HOUSE CAPTAIN\",\n  \"description\": \"Nominate members for the role of House Captain\",\n  \"maxVotes\": 1,\n  \"displayOrder\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/positions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "positions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Position",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"HOUSE CAPTAIN UPDATED\",\n  \"displayOrder\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/positions/POSITION_ID_HERE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "positions",
+                "POSITION_ID_HERE"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Position",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/positions/POSITION_ID_HERE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "positions",
+                "POSITION_ID_HERE"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Candidates for Position",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/positions/POSITION_ID_HERE/candidates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "positions",
+                "POSITION_ID_HERE",
+                "candidates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Nominate Candidate (Cloudinary Multipart)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "electionId",
+                  "value": "ELECTION_ID_HERE",
+                  "type": "text"
+                },
+                {
+                  "key": "positionId",
+                  "value": "POSITION_ID_HERE",
+                  "type": "text"
+                },
+                {
+                  "key": "studentId",
+                  "value": "S009988",
+                  "type": "text"
+                },
+                {
+                  "key": "admissionId",
+                  "value": "19992",
+                  "type": "text"
+                },
+                {
+                  "key": "firstName",
+                  "value": "JOHN",
+                  "type": "text"
+                },
+                {
+                  "key": "lastName",
+                  "value": "DOE",
+                  "type": "text"
+                },
+                {
+                  "key": "slogan",
+                  "value": "For the Students, by the Students",
+                  "type": "text"
+                },
+                {
+                  "key": "manifesto",
+                  "value": "A comprehensive school improvement plan.",
+                  "type": "text"
+                },
+                {
+                  "key": "symbol",
+                  "value": "Torch",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/candidates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "candidates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Candidate",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "slogan",
+                  "value": "New updated candidate slogan",
+                  "type": "text"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/candidates/CANDIDATE_ID_HERE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "candidates",
+                "CANDIDATE_ID_HERE"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Candidate Nomination",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/candidates/CANDIDATE_ID_HERE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "candidates",
+                "CANDIDATE_ID_HERE"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Declare Results & Close Election",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/elections/ELECTION_ID_HERE/declare-results",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "elections",
+                "ELECTION_ID_HERE",
+                "declare-results"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Election Turnout and Stats",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/elections/ELECTION_ID_HERE/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "elections",
+                "ELECTION_ID_HERE",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}
