@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   authSync,
+  studentLogin,
   getCurrentElection,
   vote,
   getMyVotes,
@@ -12,6 +13,9 @@ const router = express.Router();
 
 // Synchronize student data from external login system
 router.post('/auth/sync', authSync);
+
+// Student login endpoint using Adm No (admissionId) and Contact (mobile)
+router.post('/login', studentLogin);
 
 // Protected student routes
 router.get('/election/current', authenticateStudent, getCurrentElection);

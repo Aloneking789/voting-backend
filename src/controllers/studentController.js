@@ -88,6 +88,60 @@ export async function authSync(req, res) {
 }
 
 /**
+ * Login student using Admission Number (Adm No) and Contact Number (Contact).
+ */
+export async function studentLogin(req, res) {
+  try {
+    const admissionId = String(req.body.admissionId || req.body.admNo || req.body['Adm No'] || '').trim();
+    const contact = String(req.body.contact || req.body.mobile || req.body.Contact || '').trim();
+
+    if (!admissionId || !contact) {
+      return res.status(400).json({ error: 'Admission Number and Contact Number are required.' });
+    }
+
+    // Find the user by admissionId
+    const user = await prisma.user.findUnique({
+      where: { admissionId }
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid Admission Number or Contact Number.' });
+    }
+
+    // Check if contact matches
+    const dbMobile = (user.mobile || '').trim();
+    if (dbMobile !== contact) {
+      return res.status(401).json({ error: 'Invalid Admission Number or Contact Number.' });
+    }
+
+    // Update login count and last login timestamp
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        loginCount: { increment: 1 },
+        lastLoginAt: new Date()
+      }
+    });
+
+    // Generate JWT token
+    const token = generateToken({
+      id: updatedUser.id,
+      studentId: updatedUser.studentId,
+      role: 'STUDENT'
+    });
+
+    return res.status(200).json({
+      message: 'Student logged in successfully.',
+      token,
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Error during student login:', error);
+    return res.status(500).json({ error: 'Server error during student login.' });
+  }
+}
+
+/**
  * Get active election including all positions and nominated candidates.
  */
 export async function getCurrentElection(req, res) {
