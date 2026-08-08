@@ -14,7 +14,7 @@ const router = express.Router();
 // Synchronize student data from external login system
 router.post('/auth/sync', authSync);
 
-// Student login endpoint using Adm No (admissionId) and Contact (mobile)
+// Student login endpoint using Adm No (admissionId) only
 router.post('/login', studentLogin);
 
 // Protected student routes

@@ -88,15 +88,14 @@ export async function authSync(req, res) {
 }
 
 /**
- * Login student using Admission Number (Adm No) and Contact Number (Contact).
+ * Login student using Admission Number (Adm No) only.
  */
 export async function studentLogin(req, res) {
   try {
     const admissionId = String(req.body.admissionId || req.body.admNo || req.body['Adm No'] || '').trim();
-    const contact = String(req.body.contact || req.body.mobile || req.body.Contact || '').trim();
 
-    if (!admissionId || !contact) {
-      return res.status(400).json({ error: 'Admission Number and Contact Number are required.' });
+    if (!admissionId) {
+      return res.status(400).json({ error: 'Admission Number is required.' });
     }
 
     // Find the user by admissionId
@@ -105,13 +104,7 @@ export async function studentLogin(req, res) {
     });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid Admission Number or Contact Number.' });
-    }
-
-    // Check if contact matches
-    const dbMobile = (user.mobile || '').trim();
-    if (dbMobile !== contact) {
-      return res.status(401).json({ error: 'Invalid Admission Number or Contact Number.' });
+      return res.status(401).json({ error: 'Invalid Admission Number.' });
     }
 
     // Update login count and last login timestamp
